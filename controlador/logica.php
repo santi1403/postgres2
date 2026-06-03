@@ -2,7 +2,7 @@
 
 var_dump($_POST);
 
-$conexion = new PDO('pgsql:host=@dpg-d8f39bl53gjs739kr1c0-a.oregon-postgres.render.com;dbname=sena_4gjt_user','sena_4gjt','MdEyvmMNdVywTNkoijpetMBysaRHzQxD');
+$conexion = new PDO('pgsql:host=dpg-d8f39bl53gjs739kr1c0-a.oregon-postgres.render.com;dbname=sena_4gjt','sena_4gjt_user','MdEyvmMNdVywTNkoijpetMBysaRHzQxD');
 $registrar = $conexion->prepare("INSERT INTO aprendices (nombre,telefono,detalles) VALUES (?, ?)");
 $registrar->execute([$_POST["nom"], $_POST["tel"] ]);
 echo "<p style='color:white;background-color:green;font-family:calibri,arial;font-size:24px;text-align:center'>Registro exitoso</p>";
