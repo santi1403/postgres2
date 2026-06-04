@@ -1,31 +1,33 @@
 FROM php:8.2-apache
 
-# 1. Actualizar e instalar dependencias de Postgres Y MongoDB (libssl y git son para Mongo/Composer)
 RUN apt-get update && apt-get install -y \
     libpq-dev \
-    libssl-dev \
-    unzip \
-    git \
-    && docker-php-ext-install pdo pdo_pgsql pgsql \
-    && pecl install mongodb \
-    && docker-php-ext-enable mongodb
+    && docker-php-ext-install pdo pdo_pgsql pgsql
 
-# 2. Instalar Composer de forma global dentro del contenedor
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Habilitar mod_rewrite (lo mantenemos tal cual lo tenías)
+# Habilitar mod_rewrite
 RUN a2enmod rewrite
 
-# 3. Copiar todos los archivos del proyecto al contenedor
+# Copiar archivos al contenedor
 COPY . /var/www/html/
 
-# 4. Cambiar al directorio de trabajo para poder correr comandos dentro de él
-WORKDIR /var/www/html/
-
-# 5. Ejecutar Composer para crear la carpeta vendor y el autoload.php que faltaba
-RUN composer install --no-interaction --optimize-autoloader
-
-# Permisos (mantenemos tu regla de permisos)
+# Permisos
 RUN chown -R www-data:www-data /var/www/html
+
+# =========================================================
+# LO QUE SE AGREGA SIN MODIFICAR LO ANTERIOR (Para MongoDB)
+# =========================================================
+
+# 1. Instalar dependencias para compilar librerías externas (unzip y git son para Composer)
+RUN apt-get install -y libssl-dev unzip git
+
+# 2. Descargar, compilar y activar la extensión oficial de MongoDB para PHP
+RUN pecl install mongodb && docker-php-ext-enable mongodb
+
+# 3. Descargar el binario de Composer globalmente
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# 4. Cambiar el directorio de trabajo a la raíz de la app y descargar los vendors
+WORKDIR /var/www/html
+RUN composer install --no-interaction --optimize-autoloader
 
 EXPOSE 80
