@@ -4,7 +4,10 @@
     },
     "config": {
         "platform": {
-            "ext-mongodb": "1.10.0"
+            "php": "8.2"
+        },
+        "ignore-platform-reqs": {
+            "ext-mongodb": true
         }
     }
 }
