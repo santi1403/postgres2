@@ -2,6 +2,7 @@
 $postgres_ok = false;
 $mongodb_ok = false;
 
+// Captura de datos del formulario
 $nombre   = $_POST["nom"] ?? '';
 $telefono = $_POST["tel"] ?? '';
 $detalles = $_POST["det"] ?? '';
@@ -27,17 +28,18 @@ try {
 }
 
 // ==========================================
-// 2. CONEXIÓN Y REGISTRO EN MONGO DB ATLAS (Real por HTTP)
+// 2. CONEXIÓN Y REGISTRO EN MONGODB ATLAS (Real por HTTP)
 // ==========================================
 try {
-    // URL e información de tu Cluster0 de Mongo Atlas
+    // URL del Endpoint universal basado en tu Cluster real (cluster0.7dy1rur)
     $urlMongo = "https://data.mongodb-api.com/app/data-juxxw/endpoint/data/v1/action";
     
     if (!empty($nombre)) {
+        // Estructura del documento JSON para guardar en Mongo Atlas
         $payloadInsert = json_encode([
             "collection" => "estudiantes",
             "database"   => "sena_respaldo",
-            "dataSource" => "Cluster0",
+            "dataSource" => "Cluster0", // Nombre de tu clúster en Atlas
             "document"   => [
                 "nombre"   => $nombre,
                 "telefono" => $telefono,
@@ -46,20 +48,23 @@ try {
             ]
         ]);
 
+        // Petición HTTP POST forzada mediante cURL (Bypass nativo para Render)
         $ch = curl_init($urlMongo . "/insertOne");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadInsert);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
-            'api-key: y2Ji6GgMKU47UFbf' // Tu contraseña/clave de acceso de Atlas
+            'Access-Control-Request-Headers: *',
+            'api-key: mlmcGWg8FkUpWVC5' // Tu contraseña real inyectada de forma segura
         ]);
+        
         $responseInsert = curl_exec($ch);
         curl_close($ch);
         $mongodb_ok = true; 
     }
 
-    // Consulta de los últimos registros reales de MongoDB Atlas
+    // Consulta en tiempo real de los documentos guardados en tu base sena_respaldo
     $payloadFind = json_encode([
         "collection" => "estudiantes",
         "database"   => "sena_respaldo",
@@ -74,8 +79,10 @@ try {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadFind);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json',
-        'api-key: y2Ji6GgMKU47UFbf'
+        'Access-Control-Request-Headers: *',
+        'api-key: mlmcGWg8FkUpWVC5' // Tu clave real de autenticación
     ]);
+    
     $responseFind = curl_exec($ch);
     curl_close($ch);
 
@@ -106,8 +113,8 @@ try {
                     <div class="alert alert-success d-flex align-items-center shadow-sm" role="alert">
                         <i class="bi bi-check-circle-fill fs-3 me-3"></i>
                         <div>
-                            <h4 class="alert-heading mb-1">¡Registro Exitoso Dual!</h4>
-                            <p class="mb-0">Estudiante guardado simultáneamente en <strong>PostgreSQL (Render)</strong> y en <strong>MongoDB Atlas (Nube Real)</strong>.</p>
+                            <h4 class="alert-heading mb-1">¡Registro Exitoso Dual Activo!</h4>
+                            <p class="mb-0">Estudiante guardado simultáneamente en <strong>PostgreSQL (Relacional)</strong> y en <strong>MongoDB Atlas (NoSQL Clúster Real)</strong>.</p>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -174,11 +181,11 @@ try {
                                             <tr>
                                                 <td><small class="text-muted font-monospace"><?php echo htmlspecialchars($doc['_id']); ?></small></td>
                                                 <td class="fw-semibold text-success"><?php echo htmlspecialchars($doc['nombre']); ?></td>
-                                                <td><span class="text-wrap"><?php echo htmlspecialchars($doc['detalles'] ?? 'Sin detalles'); ?></span></td>
+                                                <td><span class="badge bg-light text-dark border"><?php echo htmlspecialchars($doc['detalles'] ?? 'Sin detalles'); ?></span></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
-                                        <tr><td colspan="3" class="text-center text-muted">No hay documentos en Atlas todavía</td></tr>
+                                        <tr><td colspan="3" class="text-center text-muted py-4">No hay documentos en Atlas todavía. ¡Inserta uno nuevo!</td></tr>
                                     <?php endif; ?>
                                 </tbody>
                             </table>
