@@ -1,10 +1,10 @@
 {
     "require": {
-        "mongodb/mongodb": "^1.16"
+        "mongodb/mongodb": "1.15.0"
     },
     "config": {
         "platform": {
-            "ext-mongodb": "1.16.0"
+            "ext-mongodb": "1.15.0"
         }
     }
 }
