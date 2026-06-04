@@ -1,13 +1,5 @@
 {
     "require": {
-        "mongodb/mongodb": "1.10.0"
-    },
-    "config": {
-        "platform": {
-            "php": "8.2"
-        },
-        "ignore-platform-reqs": {
-            "ext-mongodb": true
-        }
+        "php": "^8.2"
     }
 }
